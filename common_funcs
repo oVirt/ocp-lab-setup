@@ -15,7 +15,7 @@ LOCALDISK_VG_MB="409600"
 
 echo() { local N=""; [[ "$1" == "-n" ]] && { N="n"; shift; }; command echo -${N}e "[\033[0;31mLAB\033[0m] $@"; }
 die() { echo "FAIL: $@"; exit 1; }
-curl_api() { local endpoint=$1; shift; curl -s -k -u admin@internal:password -H 'Content-type: application/xml' https://$ENGINE/ovirt-engine/api/$endpoint $@; }
+curl_api() { local endpoint=$1; shift; curl -s -k -u admin@internal:password -H 'Content-type: application/xml' https://$ENGINE/ovirt-engine/api/${endpoint} "$@"; }
 
 SSH='ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -l root'
 SCP='scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o User=root'
