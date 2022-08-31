@@ -11,6 +11,11 @@ OCP_DOMAIN="example.com"
 
 LOCALDISK_VG_MB="409600"
 
+MASTER_MEMORY=34359738368 #32GB
+WORKER_MEMORY=17179869184 #16GB
+WORKER_MEMORY_MIN=6442450944 #6GB
+DISK_SIZE=107374182400 # 100GB
+
 ### internal
 
 echo() { local N=""; [[ "$1" == "-n" ]] && { N="n"; shift; }; command echo -${N}e "[\033[0;31mLAB\033[0m] $@"; }

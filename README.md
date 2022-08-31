@@ -35,4 +35,5 @@ can be run individually for troubleshooting/reinstalls
 - _insert reboot_
 - set up engine hosts's networking and install oVirt engine
 - set up local storage on hosts
-- ....and finally some VM stuff
+- add oVirt hosts
+- add master and worker templates

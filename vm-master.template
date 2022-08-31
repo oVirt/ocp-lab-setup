@@ -1,0 +1,34 @@
+<vm>
+  <name>master</name>
+  <cluster>
+    <name>Default</name>
+  </cluster>
+  <template>
+    <name>Blank</name>
+  </template>
+  <memory>__MASTER_MEMORY__</memory>
+  <memory_policy>
+    <guaranteed>__MASTER_MEMORY__</guaranteed>
+  </memory_policy>
+  <os>
+    <boot>
+      <devices>
+        <device>hd</device>
+        <device>network</device>
+        <device>cdrom</device>
+      </devices>
+    </boot>
+    <type>other_linux_kernel_4</type>
+  </os>
+  <placement_policy>
+    <affinity>pinned</affinity>
+  </placement_policy>
+  <custom_properties>
+    <custom_property>
+      <name>localdisk</name>
+      <value>lvmthin</value>
+    </custom_property>
+  </custom_properties>
+</vm>
+
+
