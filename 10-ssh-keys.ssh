@@ -1,0 +1,29 @@
+#!/bin/bash
+#
+# LAB_ROOT_PASS=
+#
+. common_funcs
+
+[[ -r engine && -r hosts ]] || die "fix inventory"
+[[ -r "$HOME/.ssh/id_rsa.pub" && -x "/usr/bin/ssh-copy-id" ]] || die "fix ssh"
+
+[[ "$LAB_ROOT_PASS" ]] || { echo -n; read -s -p "Password for $ENGINE: " LAB_ROOT_PASS; command echo; }
+
+export _LAB_ROOT_PASS="$LAB_ROOT_PASS"
+#for i in $ENGINE $HOSTS; do
+#    echo "Install key for $i"
+#    SSH_ASKPASS_REQUIRE=force SSH_ASKPASS=./common_funcs ssh-copy-id -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$i
+#done
+
+echo "Generate oVirt Engine RSA key if missing"
+$SSH $ENGINE '[[ -r /root/.ssh/id_rsa ]] || ssh-keygen -q -N "" -t rsa -f /root/.ssh/id_rsa'
+
+echo "Add engine pubkey to hosts"
+touch engine_key
+$SSH $ENGINE "cat .ssh/id_rsa.pub" > engine_key.pub
+$SSH $ENGINE 'echo "StrictHostKeyChecking=accept-new" > /etc/ssh/ssh_config.d/lab.conf'
+for i in $HOSTS; do
+    ssh-copy-id -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i engine_key.pub root@$i
+done
+rm -f engine_key engine_key.pub
+    

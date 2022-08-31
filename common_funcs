@@ -1,0 +1,28 @@
+### vars
+
+BAREMETAL_NET="10.100.0.0/16"
+BAREMETAL_OCP_API="10.100.0.1"
+BAREMETAL_OCP_APPS="10.100.0.2"
+BAREMETAL_ENGINE="10.100.0.3"
+BAREMETAL_DHCP_RANGE="10.100.0.4,10.100.254.254"
+
+OCP_CLUSTER="perf-test"
+OCP_DOMAIN="example.com"
+
+LOCALDISK_VG_MB="409600"
+
+### internal
+
+echo() { local N=""; [[ "$1" == "-n" ]] && { N="n"; shift; }; command echo -${N}e "[\033[0;31mLAB\033[0m] $@"; }
+die() { echo "FAIL: $@"; exit 1; }
+
+CURL_API='curl -s -k  -u admin@internal:password -H "Content-type: application/xml"'
+
+SSH='ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -l root'
+SCP='scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o User=root'
+
+ENGINE=$(cat engine | cut -d, -f1 2>/dev/null)
+HOSTS=$(cat hosts | cut -d, -f1 2>/dev/null)
+
+# ssh keyboard interactive login
+[[ "$_LAB_ROOT_PASS" ]] && command echo "$_LAB_ROOT_PASS"
