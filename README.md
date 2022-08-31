@@ -38,3 +38,15 @@ can be run individually for troubleshooting/reinstalls
 - add oVirt hosts
 - add master and worker templates
 - create all individual VMs
+
+## Missing
+for Assisted Installer flow
+- document discovery iso upload
+- attach discovery CD
+- start VMs
+
+for IPI flow
+- create install-config.yaml
+- baremetal installer specific setup
+- start vBMCs 
+
