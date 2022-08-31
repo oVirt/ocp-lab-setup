@@ -37,3 +37,4 @@ can be run individually for troubleshooting/reinstalls
 - set up local storage on hosts
 - add oVirt hosts
 - add master and worker templates
+- create all individual VMs
