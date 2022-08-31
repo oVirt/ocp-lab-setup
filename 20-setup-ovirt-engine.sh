@@ -55,3 +55,7 @@ $SSH $ENGINE "
 engine-config -s ClientModeVncDefault=NoVnc; 
 engine-config -s UserDefinedVMProperties='localdisk=^(lvm|lvmthin)$' --cver=4.7;
 systemctl restart ovirt-engine"
+
+echo "Roll engine key to hosts for Add Host"
+$SSH $ENGINE "ssh-keygen -y -f /etc/pki/ovirt-engine/keys/engine_id_rsa > /etc/pki/ovirt-engine/keys/engine_id_rsa.pub"
+$SSH $ENGINE "for i in $(command echo $HOSTS); do ssh-copy-id -i /etc/pki/ovirt-engine/keys/engine_id_rsa root@\$i & done; wait"

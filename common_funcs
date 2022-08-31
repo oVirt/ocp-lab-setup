@@ -15,14 +15,13 @@ LOCALDISK_VG_MB="409600"
 
 echo() { local N=""; [[ "$1" == "-n" ]] && { N="n"; shift; }; command echo -${N}e "[\033[0;31mLAB\033[0m] $@"; }
 die() { echo "FAIL: $@"; exit 1; }
-
-CURL_API='curl -s -k  -u admin@internal:password -H "Content-type: application/xml"'
+curl_api() { local endpoint=$1; shift; curl -s -k -u admin@internal:password -H 'Content-type: application/xml' https://$ENGINE/ovirt-engine/api/$endpoint $@; }
 
 SSH='ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -l root'
 SCP='scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o User=root'
 
-ENGINE=$(cat engine | cut -d, -f1 2>/dev/null)
-HOSTS=$(cat hosts | cut -d, -f1 2>/dev/null)
+ENGINE=$(cat engine 2>/dev/null | cut -d, -f1)
+HOSTS=$(cat hosts 2>/dev/null | cut -d, -f1)
 
 # ssh keyboard interactive login
 [[ "$_LAB_ROOT_PASS" ]] && command echo "$_LAB_ROOT_PASS"
