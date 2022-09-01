@@ -14,6 +14,7 @@ for i in $HOSTS; do
     chmod +x /etc/rc.local;
     [[ \"\$(losetup -a | cut -d: -f1)\" == /dev/loop0 ]] || /etc/rc.local;
     lvmdevices --adddev /dev/loop0;
+    sleep 5;
     pvdisplay -s /dev/loop0 || pvcreate /dev/loop0;
     vgdisplay ovirt-local -s || vgcreate ovirt-local /dev/loop0;
     lvdisplay ovirt-local/pool0 || lvcreate -l100%FREE --thinpool pool0 ovirt-local" &
