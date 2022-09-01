@@ -22,7 +22,8 @@ nmcli c mod $baremetal_iface connection.zone public;
 nmcli c mod $baremetal_iface ipv4.addresses $BAREMETAL_ENGINE/$baremetal_netmask ipv4.method manual
 nmcli c up $baremetal_iface
 route add -net $BAREMETAL_NET dev $baremetal_iface;
-firewall-cmd --permanent --zone=public --add-service=nfs --add-service=dhcp --add-service=dns;
+firewall-cmd --permanent --zone=public --add-service=dhcp --add-service=dns;
+firewall-cmd --permanent --zone=external --add-service=nfs;
 firewall-cmd --permanent --zone=external --add-masquerade;
 firewall-cmd --permanent --zone=external --add-service=https;
 firewall-cmd --permanent --zone=external --add-port=6100/tcp;

@@ -17,11 +17,8 @@ done
 
 echo "Add logical networks"
 dc_id=$(curl_api "/datacenters?search=name=Default" | sed -n "s/.*data_center href.*id=\"\(.*\)\">/\1/p")
-cluster_id=$(curl_api "/clusters?search=name=Default" | sed -n "s/.*cluster href.*id=\"\(.*\)\">/\1/p")
 for net in baremetal provisioning; do
     curl_api /networks -d "<network> <name>$net</name> <data_center id=\"$dc_id\"/> </network>"
-    network_id=$(curl_api "/networks?search=name=$net" | sed -n "s/.*network href.*id=\"\(.*\)\">/\1/p")
-    curl_api /clusters/$cluster_id/networks -d "<network id=\"$network_id\" />"
 done
 
 all=$(cat hosts | wc -l | tr -d " ")
@@ -32,6 +29,13 @@ while [[ "$up_num" -lt "$all" ]]; do
     up_ids=$(curl_api "/hosts?search=status=up" | sed -n "s/.*host href.*id=\"\(.*\)\">/\1/p")
     up_num=$(command echo $up_ids | wc -w | tr -d " ")
     echo "${up_num}/${all} hosts up"
+done
+
+echo "Attach baremetal and provisioning networks"
+cluster_id=$(curl_api "/clusters?search=name=Default" | sed -n "s/.*cluster href.*id=\"\(.*\)\">/\1/p")
+for net in baremetal provisioning; do
+    network_id=$(curl_api "/networks?search=name=$net" | sed -n "s/.*network href.*id=\"\(.*\)\">/\1/p")
+    curl_api /clusters/$cluster_id/networks -d "<network id=\"$network_id\" />"
 done
 
 echo "Setup networks"
@@ -47,11 +51,14 @@ done
 echo "Add data SD"
 sd_host_id=$(command echo $up_ids | cut -d" " -f1)
 sd_host_name=$(curl_api "/hosts?search=id=$sd_host_id" | sed -n "s|.*<name>\(.*\)</name>|\1|p" | head -1)
-curl_api /storagedomains -d "<storage_domain> <name>data</name> <type>data</type> <storage> <type>nfs</type> <address>$ENGINE</address> <path>/srv/data</path> </storage> <host> <name>$sd_host_name</name> </host> </storage_domain>"
+curl_api /storagedomains -d "<storage_domain> <name>data</name> <type>data</type> <storage> <type>nfs</type> <address>$ENGINE</address> <path>/srv/data</path> <nfs_version>v4_2</nfs_version> </storage> <host> <name>$sd_host_name</name> </host> </storage_domain>"
+
+echo "Attach data SD to Default DC"
+curl_api "/datacenters/$dc_id/storagedomains" -d "<storage_domain> <name>data</name> </storage_domain>"
 
 echo "Wait for DC to be up"
 dc_status=
 while [[ "$dc_status" != "up" ]]; do
     sleep 10
-    dc_status=$(curl_api "/datacenters?search=name=Default" | sed -n "s|.*<status>\(.*\)</status>|\1|p")
+    dc_status=$(curl_api "/datacenters/$dc_id" | sed -n "s|.*<status>\(.*\)</status>|\1|p")
 done
