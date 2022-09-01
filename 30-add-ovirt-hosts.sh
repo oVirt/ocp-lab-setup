@@ -24,7 +24,7 @@ for net in baremetal provisioning; do
     curl_api /clusters/$cluster_id/networks -d "<network id=\"$network_id\" />"
 done
 
-all=$(cat hosts | wc -l)
+all=$(cat hosts | wc -l | tr -d " ")
 echo "Wait for $all hosts to be up"
 up_num=0
 while [[ "$up_num" -lt "$all" ]]; do

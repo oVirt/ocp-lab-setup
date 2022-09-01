@@ -21,7 +21,7 @@ echo "Install engine"
     curl -O $REPO_API/rhel_86_engine_x86.repo ;
     curl -O $REPO_API/rhv_45_engine.repo ;
     dnf module enable -y postgresql:12 pki-deps ;
-    dnf install -y rhvm"
+    dnf install -y rhvm dnsmasq"
 
 echo "Install hosts"
 for i in $HOSTS; do
