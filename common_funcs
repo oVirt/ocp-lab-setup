@@ -5,6 +5,7 @@ BAREMETAL_OCP_API="10.100.0.1"
 BAREMETAL_OCP_APPS="10.100.0.2"
 BAREMETAL_ENGINE="10.100.0.3"
 BAREMETAL_DHCP_RANGE="10.100.0.4,10.100.254.254"
+IPMI_START="10.200.0.0" # has to be a.b.c.0/16
 
 OCP_CLUSTER="perf-test"
 OCP_DOMAIN="example.com"
@@ -26,6 +27,19 @@ WORKERS=20
 echo() { local N=""; [[ "$1" == "-n" ]] && { N="n"; shift; }; command echo -${N}e "[\033[0;31mLAB\033[0m] $@"; }
 die() { echo "FAIL: $@"; exit 1; }
 curl_api() { local endpoint=$1; shift; curl -s -k -u admin@internal:password -H 'Content-type: application/xml' https://$ENGINE/ovirt-engine/api/${endpoint} "$@"; }
+
+# ipmi
+IPMI_D=0
+IPMI_NEXT_C=100
+next_ipmi() {
+    IPMI_ADDRESS=${IPMI_ADDRESS%$IPMI_D}$((++IPMI_D))
+    [[ "$IPMI_D" -gt "$IPMI_NEXT_C" ]] && {
+        IPMI_D=1
+        local c=$(command echo $IPMI_START | cut -d. -f3)
+        IPMI_ADDRESS="$(command echo $IPMI_START | cut -d. -f1,2).$((++c)).$IPMI_D"
+    }
+}
+IPMI_ADDRESS=$IPMI_START
 
 SSH='ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -l root'
 SCP='scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o User=root'
