@@ -10,6 +10,11 @@
   <memory_policy>
     <guaranteed>__WORKER_MEMORY_MIN__</guaranteed>
   </memory_policy>
+  <cpu>
+    <topology>
+      <sockets>__WORKER_CPUS__</sockets>
+    </topology>
+  </cpu>
   <os>
     <boot>
       <devices>

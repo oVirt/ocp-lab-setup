@@ -6,8 +6,8 @@
 [[ "$ENGINE" ]] || die "No engine" 
 
 echo "Create template VMs"
-sed "s/__MASTER_MEMORY__/$MASTER_MEMORY/g" vm-master.template > vm-master
-sed "s/__WORKER_MEMORY__/$WORKER_MEMORY/g; s/__WORKER_MEMORY_MIN__/$WORKER_MEMORY_MIN/g" vm-worker.template > vm-worker
+sed "s/__MASTER_MEMORY__/$MASTER_MEMORY/g; s/__MASTER_CPUS__/$MASTER_CPUS/g" vm-master.template > vm-master
+sed "s/__WORKER_MEMORY__/$WORKER_MEMORY/g; s/__WORKER_MEMORY_MIN__/$WORKER_MEMORY_MIN/g; s/__WORKER_CPUS__/$WORKER_CPUS/g" vm-worker.template > vm-worker
 curl_api /vms -d "@vm-master"
 curl_api /vms -d "@vm-worker"
 
@@ -25,6 +25,8 @@ for i in master worker; do
     
     while [[ "$(curl_api "/disks?search=status!=ok" | wc -l)" -gt 2 ]]; do sleep 10; done
 
+    echo "Convert $i VM to ${i}_template"
     curl_api /templates -d "<template><name>${i}_template</name><vm id=\"${id}\"/></template>"
+    rc=1
+    while [[ "$rc" -ne 0 ]]; do sleep 5; curl_api "/vms/${id}" -f -X DELETE; rc=$?; done
 done
-sleep 5

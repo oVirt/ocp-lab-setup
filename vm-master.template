@@ -10,6 +10,11 @@
   <memory_policy>
     <guaranteed>__MASTER_MEMORY__</guaranteed>
   </memory_policy>
+  <cpu>
+    <topology>
+      <sockets>__MASTER_CPUS__</sockets>
+    </topology>
+  </cpu>
   <os>
     <boot>
       <devices>
