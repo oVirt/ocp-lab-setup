@@ -17,6 +17,9 @@ echo "Wipe local storage on hosts"
 for i in $HOSTS; do
 	$SSH $i "
     wipes=\$(lvdisplay ovirt-local -c | grep -v ovirt-local/pool0 | cut -d: -f1);
-    for i in \$wipes; do wipefs -a \$i; done" &
+    for i in \$wipes; do [[ -h \$i ]] && wipefs -a \$i; done;
+    lvremove -y ovirt-local/pool0" &
 done
 wait
+
+./30-setup-host-storage.sh
