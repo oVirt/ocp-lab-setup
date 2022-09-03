@@ -23,6 +23,7 @@ nmcli c mod $baremetal_iface ipv4.addresses $BAREMETAL_ENGINE/$baremetal_netmask
 nmcli c up $baremetal_iface
 route add -net $BAREMETAL_NET dev $baremetal_iface;
 firewall-cmd --permanent --zone=public --add-service=dhcp --add-service=dns;
+firewall-cmd --permanent --zone=public --add-port=623/udp
 firewall-cmd --permanent --zone=external --add-service=nfs;
 firewall-cmd --permanent --zone=external --add-masquerade;
 firewall-cmd --permanent --zone=external --add-service=https;
@@ -54,16 +55,3 @@ echo "/srv/data *(rw,insecure,no_root_squash)" > /etc/exports.d/data.exports;
 exportfs -va;
 systemctl enable nfs-server;
 systemctl start nfs-server'
-
-echo "Run engine-setup"
-sed "s/__ENGINE__/$ENGINE/g; s/__ENGINE_DOMAIN__/$(command echo $ENGINE | cut -d. -f2-)/g" ovirt-engine-setup-answers.template > ovirt-engine-setup-answers
-$SCP ovirt-engine-setup-answers $ENGINE:
-$SSH $ENGINE "engine-setup --config-append=ovirt-engine-setup-answers --accept-defaults"
-$SSH $ENGINE "
-engine-config -s ClientModeVncDefault=NoVnc; 
-engine-config -s UserDefinedVMProperties='localdisk=^(lvm|lvmthin)$' --cver=4.7;
-systemctl restart ovirt-engine"
-
-echo "Roll engine key to hosts for Add Host"
-$SSH $ENGINE "ssh-keygen -y -f /etc/pki/ovirt-engine/keys/engine_id_rsa > /etc/pki/ovirt-engine/keys/engine_id_rsa.pub"
-$SSH $ENGINE "for i in $(command echo $HOSTS); do ssh-copy-id -i /etc/pki/ovirt-engine/keys/engine_id_rsa root@\$i & done; wait"
