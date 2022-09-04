@@ -29,6 +29,10 @@ echo() { local N=""; [[ "$1" == "-n" ]] && { N="n"; shift; }; command echo -${N}
 die() { echo "FAIL: $@"; exit 1; }
 curl_api() { local endpoint=$1; shift; curl -s -k -u admin@internal:password -H 'Content-type: application/xml' https://$ENGINE/ovirt-engine/api/${endpoint} "$@"; }
 
+get_first_nic() {
+    curl_api "/vms?search=name=${1}&follow=nics" | tr -d "\n" | sed 's|^.*<nics>||g; s|</nics>.*$||g' | sed -n 's|^.*<name>nic1</name>.*<address>\(.*\)</address>.*<name>nic2</name>.*|\1|p'
+}
+
 # ipmi
 IPMI_NEXT_C=100
 next_ipmi() {

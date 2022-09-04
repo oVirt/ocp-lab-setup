@@ -4,10 +4,6 @@
 
 [[ -r pull-secret.txt ]] || die "Please create pull-secret.txt"
 
-get_first_nic() {
-    curl_api "/vms?search=name=${1}&follow=nics" | tr -d "\n" | sed 's|^.*<nics>||g; s|</nics>.*$||g' | sed -n 's|^.*<name>nic1</name>.*<address>\(.*\)</address>.*<name>nic2</name>.*|\1|p'
-}
-
 echo "Render install-config.yaml"
 sshkey=$($SSH $ENGINE 'cat /root/.ssh/id_rsa.pub')
 pull=$(cat pull-secret.txt)
