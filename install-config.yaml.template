@@ -1,0 +1,24 @@
+apiVersion: v1
+baseDomain: __OCP_DOMAIN__
+metadata:
+  name: __OCP_CLUSTER__
+networking:
+  machineNetwork:
+  - cidr: __BAREMETAL_NET__
+  networkType: OVNKubernetes
+compute:
+- name: worker
+  replicas: __WORKERS__ 
+controlPlane:
+  name: master
+  replicas: __MASTERS__
+  platform:
+    baremetal: {}
+pullSecret: '__PULL_SECRET__'
+sshKey: '__SSH_KEY__'
+platform:
+  baremetal:
+    apiVIP: __BAREMETAL_OCP_API__
+    ingressVIP: __BAREMETAL_OCP_APPS__
+    provisioningNetworkCIDR: __PROVISIONING_NET__
+    hosts:
