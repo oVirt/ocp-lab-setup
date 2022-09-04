@@ -42,8 +42,8 @@ next_ipmi() {
 reset_ipmi_address() { IPMI_ADDRESS=$IPMI_START; IPMI_D=0; }
 reset_ipmi_address
 
-SSH='ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -l root'
-SCP='scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o User=root'
+SSH='ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=quiet -o User=root'
+SCP='scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=quiet -o User=root'
 
 ENGINE=$(cat engine 2>/dev/null | cut -d, -f1)
 HOSTS=$(cat hosts 2>/dev/null | cut -d, -f1)
