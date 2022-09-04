@@ -30,7 +30,6 @@ die() { echo "FAIL: $@"; exit 1; }
 curl_api() { local endpoint=$1; shift; curl -s -k -u admin@internal:password -H 'Content-type: application/xml' https://$ENGINE/ovirt-engine/api/${endpoint} "$@"; }
 
 # ipmi
-IPMI_D=0
 IPMI_NEXT_C=100
 next_ipmi() {
     IPMI_ADDRESS=${IPMI_ADDRESS%$IPMI_D}$((++IPMI_D))
@@ -40,7 +39,8 @@ next_ipmi() {
         IPMI_ADDRESS="$(command echo $IPMI_START | cut -d. -f1,2).$((++c)).$IPMI_D"
     }
 }
-IPMI_ADDRESS=$IPMI_START
+reset_ipmi_address() { IPMI_ADDRESS=$IPMI_START; IPMI_D=0; }
+reset_ipmi_address
 
 SSH='ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -l root'
 SCP='scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o User=root'
