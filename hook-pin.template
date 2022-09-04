@@ -1,0 +1,34 @@
+#!/usr/bin/python3
+from __future__ import absolute_import
+
+from xml.dom import minidom
+import os
+import sys
+
+import hooking
+
+def pin(vmid):
+    sys.stderr.write('[LAB] hook-pin: pin VM')
+    res = os.popen('curl -s -k -u admin@internal:password -H "Content-type: application/xml" -X PUT -d "<vm><placement_policy><hosts><host> <name>$(hostname)</name> </host></hosts></placement_policy></vm>" https://__ENGINE__/ovirt-engine/api/vms/%s' % vmid)
+    vmstr = res.read()
+    sys.stderr.write('[LAB] hook-pin update VM result: %s' % vmstr)
+
+def main():
+    if os.environ.get('localdisk') is None:
+        return
+    domxml = hooking.read_domxml()
+    vmid = domxml.getElementsByTagName("uuid")[0].firstChild.nodeValue
+
+    res=os.popen('curl -s -k -u admin@internal:password -H "Content-type: application/xml" https://__ENGINE__/ovirt-engine/api/vms/%s' % vmid)
+    vmstr = res.read()
+    sys.stderr.write('[LAB] hook-pin read VM xml: %s' % vmstr)
+
+    vmxml = minidom.parseString(vmstr)
+    placement = vmxml.getElementsByTagName('placement_policy')
+    if placement.length == 0:
+        pin(vmid)
+    hosts = placement[0].getElementsByTagName('host')
+    if hosts.length != 1:
+        pin(vmid)
+
+main()

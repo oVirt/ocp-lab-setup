@@ -5,6 +5,14 @@
 
 [[ "$HOSTS" ]] || die "No hosts" 
 
+echo "Create hook to pin VMs"
+sed "s/__ENGINE__/$ENGINE/g;" hook-pin.template hook-pin
+chmod +x hook-pin
+for i in $HOSTS; do
+    $SCP hook-pin $i:/usr/libexec/vdsm/hooks/after_vm_start/hook-pin &
+done
+wait
+
 echo "Setup local disk space on hosts"
 for i in $HOSTS; do
 	$SSH $i "
