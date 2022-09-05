@@ -39,7 +39,7 @@ next_ipmi() {
     IPMI_ADDRESS=${IPMI_ADDRESS%$IPMI_D}$((++IPMI_D))
     [[ "$IPMI_D" -gt "$IPMI_NEXT_C" ]] && {
         IPMI_D=1
-        local c=$(command echo $IPMI_START | cut -d. -f3)
+        local c=$(command echo $IPMI_ADDRESS | cut -d. -f3)
         IPMI_ADDRESS="$(command echo $IPMI_START | cut -d. -f1,2).$((++c)).$IPMI_D"
     }
 }
