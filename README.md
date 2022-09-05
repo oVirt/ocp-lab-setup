@@ -5,7 +5,7 @@ There are many assumptions based on Red Hat's Perf&Scale labs
 ## Design
 oVirt setup with VMs running OCP cluster using isolated networks
 - 1 physical host installed with oVirt Engine, hosting dnsmasq for OCP network, routing to external networks, hosting NFS for VM initialization
-- n-1 physical hosts installed as oVirt hosts, using vdsm-hook-localdisk for local storage. Storage is initialized when VM starts on a host for the first time, then it's reused. VMs need to be pinned to their original host.
+- n-1 physical hosts installed as oVirt hosts, using vdsm-hook-localdisk for local storage. Storage is initialized when VM starts on a host for the first time, then it's reused. VMs are also pinned on their first power on via a vdsm-hook call back to API.
 - OCP "baremetal" network running dnsmasq, routed through the engine host to public
 - OCP "provisioning" network for PXE baremetal provisioning
 
@@ -38,15 +38,17 @@ can be run individually for troubleshooting/reinstalls
 - add oVirt hosts
 - add master and worker templates
 - create all individual VMs
+- start vBMC servers
+### Assited Installer flow
+- upload iso
+- attach iso
+### IPI flow
+- prepare install-config
+- scale up
 
 ## Missing
-for Assisted Installer flow
-- document discovery iso upload
-- attach discovery CD
-- start VMs
-
-for IPI flow
-- create install-config.yaml
-- baremetal installer specific setup
-- start vBMCs 
-
+starting VMs
+better ovirtvbmc control.
+skipping masters to support baremetal masters + virtual workers
+configure prometheus to run on masters, by default it runs on worker nodes and they easily overload
+local mirror of RHCOS and/or OCP registry mirror
