@@ -47,8 +47,8 @@ can be run individually for troubleshooting/reinstalls
 - scale up
 
 ## Missing
-starting VMs
-better ovirtvbmc control.
-skipping masters to support baremetal masters + virtual workers
-configure prometheus to run on masters, by default it runs on worker nodes and they easily overload
-local mirror of RHCOS and/or OCP registry mirror
+- starting VMs. Not needed for IPI so maybe not...
+- better ovirtvbmc control. https://github.com/oVirt/vbmc/issues/3
+- skipping masters to support baremetal masters + virtual workers
+- configure prometheus to run on masters, by default it runs on a random worker node and it becomes a huge memory hog with >100 nodes
+- local mirror of RHCOS and/or OCP registry mirror
