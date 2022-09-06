@@ -1,4 +1,4 @@
-# set up oVirt/RHV in a perf lab
+# set up oVirt/RHV in a perf lab for OCP testing
 
 There are many assumptions based on Red Hat's Perf&Scale labs
 
