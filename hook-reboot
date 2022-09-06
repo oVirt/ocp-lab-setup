@@ -1,0 +1,20 @@
+#!/usr/bin/python3
+from __future__ import absolute_import
+
+import hooking
+
+def main():
+    domxml = hooking.read_domxml()
+    oss = domxml.getElementsByTagName("os")
+    if oss.length == 0:
+        return
+    bioss = oss[0].getElementsByTagName("bios")
+    if bioss.length == 0:
+        bios = domxml.createElement('bios')
+        oss[0].appendChild(bios)
+    else:
+        bios = bioss[0]
+    bios.setAttribute('rebootTimeout', '2000')
+    hooking.write_domxml(domxml)
+
+main()

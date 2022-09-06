@@ -13,6 +13,12 @@ for i in $HOSTS; do
 done
 wait
 
+echo "Create hook to reboot stuck VMs"
+for i in $HOSTS; do
+    $SCP hook-reboot $i:/usr/libexec/vdsm/hooks/before_vm_start/hook-reboot &
+done
+wait
+
 echo "Setup local disk space on hosts"
 for i in $HOSTS; do
 	$SSH $i "
