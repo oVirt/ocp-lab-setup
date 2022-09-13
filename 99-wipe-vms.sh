@@ -5,9 +5,14 @@
 
 [[ "$HOSTS" ]] || die "No hosts" 
 
-echo "Delete all VMs"
+echo "Stop all VMs"
 mastervms=$(curl_api "/vms?search=name=master*" | sed -n "s/.*vm href.*id=\"\(.*\)\">/\1/p")
 workervms=$(curl_api "/vms?search=name=worker*" | sed -n "s/.*vm href.*id=\"\(.*\)\">/\1/p")
+for i in $mastervms $workervms; do
+    curl_api "/vms/${i}/shutdown" -d "<action> <force>true</force> </action>"
+done
+
+echo "Delete all VMs"
 for i in $mastervms $workervms; do
     curl_api "/vms/${i}" -f -X DELETE
     [[ "$?" -eq 0 ]] || die "failed to delete VM id $i"
