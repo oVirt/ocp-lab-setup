@@ -19,14 +19,15 @@ disk_id=$(curl_api "/disks?search=name=$ISO" |  sed -n "s/.*disk href.*id=\"\(.*
     [[ $? -eq 0 ]] || die "Failed to remove previous ISO"
 }
 
-echo "Upload $MODE"
+name=$(basename $ISO)
+echo "Upload $MODE iso named $name"
 if [[ "$MODE" == "local" ]]; then
     curl -k -o ovirt-engine.pem "https://$ENGINE/ovirt-engine/services/pki-resource?resource=ca-certificate&format=X509-PEM-CA"
-    echo "password" > ovirt-img.password
-    ovirt-img upload-disk --engine-url https://$ENGINE --username admin@internal -s data --cafile=ovirt-engine.pem --password-file=ovirt-img.password --name="$ISO" "$ISO"
+    command echo "password" > ovirt-img.password
+    ovirt-img upload-disk --engine-url https://$ENGINE --username admin@internal -s data --cafile=ovirt-engine.pem --password-file=ovirt-img.password --name="$name" "$ISO"
     rm -f ovirt-img.password
 elif [[ "$MODE" == "remote" ]]; then
     $SSH $ENGINE "curl -f -o \"$ISO\" \"$URL\" || echo Download failed; echo password > ovirt-img.password"
-    $SSH $ENGINE ovirt-img upload-disk --engine-url https://$ENGINE --username admin@internal -s data --cafile=/etc/pki/ovirt-engine/ca.pem --password-file=ovirt-img.password --name="$ISO" "$ISO"
+    $SSH $ENGINE ovirt-img upload-disk --engine-url https://$ENGINE --username admin@internal -s data --cafile=/etc/pki/ovirt-engine/ca.pem --password-file=ovirt-img.password --name="$name" "$ISO"
     $SSH $ENGINE "rm -f $ISO ovirt-img.password"
 fi
