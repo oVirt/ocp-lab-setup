@@ -19,6 +19,12 @@ for i in $HOSTS; do
 done
 wait
 
+echo "Make vdsm wait longer for initial disk copy"
+for i in $HOSTS; do
+    $SCP longer-prepare-image.conf $i:/etc/vdsm/vdsm.conf.d/longer-prepare-image.conf &
+done
+wait
+
 echo "Setup local disk space on hosts"
 for i in $HOSTS; do
 	$SSH $i "
