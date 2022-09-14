@@ -2,6 +2,9 @@
 
 . common_funcs
 
+# Approve them once up with
+# oc get csr -ojson | jq -r '.items[] | select(.status == {} ) | .metadata.name' | xargs oc adm certificate approve
+
 [[ -n "$KUBECONFIG" ]] || die "Need KUBECONFIG set"
 [[ $# -eq 2 ]] || die "$0 <start> <how many>"
 
