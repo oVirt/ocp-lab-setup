@@ -23,7 +23,7 @@
         <device>cdrom</device>
       </devices>
     </boot>
-    <type>other_linux_kernel_4</type>
+    <type>rhcos_x64</type>
   </os>
   <placement_policy>
     <affinity>pinned</affinity>
