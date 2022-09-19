@@ -41,7 +41,7 @@ echo "Setup dnsmasq"
 cat > dnsmasq.conf <<EOF
 address=/api.${OCP_CLUSTER}.${OCP_DOMAIN}/${BAREMETAL_OCP_API}
 address=/.apps.${OCP_CLUSTER}.${OCP_DOMAIN}/${BAREMETAL_OCP_APPS}
-dhcp-generate-names=baremetal
+read-ethers
 dhcp-ignore-names
 dhcp-option=3,$BAREMETAL_ENGINE
 dhcp-range=tag:baremetal,${BAREMETAL_DHCP_RANGE},1h
