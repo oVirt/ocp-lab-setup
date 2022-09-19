@@ -15,13 +15,14 @@ for i in $ENGINE $HOSTS; do
 done
 wait
 
-echo "Install engine"
+echo "Install engine and reboot it"
 [[ "$ENGINE" ]] && $SSH $ENGINE "
 	cd /etc/yum.repos.d ;
     curl -O $REPO_API/rhel_86_engine_x86.repo ;
     curl -O $REPO_API/rhv_45_engine.repo ;
     dnf module enable -y postgresql:12 pki-deps ;
-    dnf install -y rhvm dnsmasq"
+    dnf install -y rhvm dnsmasq &&
+    reboot"
 
 echo "Install hosts"
 for i in $HOSTS; do
@@ -29,7 +30,7 @@ for i in $HOSTS; do
     cd /etc/yum.repos.d ;
     curl -O $REPO_API/rhel_86_host_x86.repo ;
     curl -O $REPO_API/rhv_45_host.repo ;
-    dnf install -y ovirt-host vdsm-hook-localdisk;
+    dnf install -y ovirt-host vdsm-hook-localdisk"
 done
 wait
-echo "oVirt packages done"
+echo "oVirt packages done. $ENGINE has been rebooted, wait for it to come up"
