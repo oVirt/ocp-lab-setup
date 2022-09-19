@@ -9,7 +9,8 @@ echo "Stop all VMs"
 mastervms=$(curl_api "/vms?search=name=master*" | sed -n "s/.*vm href.*id=\"\(.*\)\">/\1/p")
 workervms=$(curl_api "/vms?search=name=worker*" | sed -n "s/.*vm href.*id=\"\(.*\)\">/\1/p")
 for i in $mastervms $workervms; do
-    curl_api "/vms/${i}/shutdown" -d "<action> <force>true</force> </action>"
+    stop=$(curl_api "/vms/${i}/shutdown" -f -d "<action> <force>true</force> </action>")
+    [[ $? -eq 0 ]] || die "Failed to stop VM id $i, output: $stop"
 done
 
 echo "Delete all VMs"
