@@ -3,7 +3,7 @@
 #
 . common_funcs
 
-[[ $# == 1 ]] || die "$0 <RHV repo base>\ne.g. http://FQDN/builds/4.5/rhv-4.5.2-7/api"
+[[ $# == 1 ]] || die "$0 <RHV repo base>\ne.g. http://FQDN/builds/4.5/rhv-4.5.3-1/api"
 REPO_API="$1"
 
 for i in $ENGINE $HOSTS; do
@@ -29,8 +29,7 @@ for i in $HOSTS; do
     cd /etc/yum.repos.d ;
     curl -O $REPO_API/rhel_86_host_x86.repo ;
     curl -O $REPO_API/rhv_45_host.repo ;
-    dnf install -y ovirt-host ;
-    dnf install -y https://download.copr.fedorainfracloud.org/results/ovirt/ovirt-master-snapshot/centos-stream-8-x86_64/04763139-vdsm/vdsm-hook-localdisk-4.50.2.2-6.git66f31d6a5.el8.noarch.rpm" &
+    dnf install -y ovirt-host vdsm-hook-localdisk;
 done
 wait
 echo "oVirt packages done"
