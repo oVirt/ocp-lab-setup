@@ -51,7 +51,7 @@ done
 echo "Add data SD"
 sd_host_id=$(command echo $up_ids | cut -d" " -f1)
 sd_host_name=$(curl_api "/hosts?search=id=$sd_host_id" | sed -n "s|.*<name>\(.*\)</name>|\1|p" | head -1)
-curl_api /storagedomains -d "<storage_domain> <name>data</name> <type>data</type> <storage> <type>nfs</type> <address>$ENGINE</address> <path>/srv/data</path> <nfs_version>v4_2</nfs_version> </storage> <host> <name>$sd_host_name</name> </host> </storage_domain>"
+curl_api /storagedomains -d "<storage_domain> <name>data</name> <type>data</type> <storage> <type>nfs</type> <address>$ENGINE</address> <path>/srv/data</path> <nfs_version>v4_2</nfs_version> <nfs_timeo>600</nfs_timeo> </storage> <host> <name>$sd_host_name</name> </host> </storage_domain>"
 
 echo "Attach data SD to Default DC"
 curl_api "/datacenters/$dc_id/storagedomains" -d "<storage_domain> <name>data</name> </storage_domain>"
