@@ -1,28 +1,39 @@
 # Walkthrough 
 
 This is a walkthrough for the OCP worker on VMs project, that can be found here: [ocp-lab-setu]() https://github.com/oVirt/ocp-lab-setup)
+It is meant to result in 3 bare-metal OCP masters and a large number of virtual-machine based workers. The actual number depends on the resources you have 
+available in the RHV cluster that's set up as part of this walkthrough. The default is to have 3 virtual masters and 10 virtual workers though.
 
 ## Setting up the environment
 
+### Adjusting variables required for the installation
+
+Configure the number of masters and or workers you want to deploy as VMs in `common_funcs`:
+**MASTERS=0
+WORKERS=200**
+
+The name in `common_funcs` needs to match the name you give your OCP cluster:
+**OCP_CLUTER="perfscale3"
+OCP_DOMAIN="example.com"**
+
+
 ### Get an inventory
 ```
-./05-get-inventory.sh http://quads.rdu2.scalelab.redhat.com/cloud/cloud09_ocpinventory.json
+./05-get-inventory.sh <URL_TO_OCP_INVENTORY_FILE>
 ```
 We removed the first 5 entries, since we need those hosts as masters and infra nodes which resulted in the `hosts` file.
-```
-e21-h20-b03-fc640.rdu2.scalelab.redhat.com,eno1,ens2f0,ens2f1
-e21-h20-b04-fc640.rdu2.scalelab.redhat.com,eno1,ens2f0,ens2f1
-```
+It is important to make sure that the interfaces are interconnected - adjust the name-based mapping in 05-get-inventory.sh or edit manually if that's necessary
+
 We need to distribute our public key so we can work on the nodes without the need to authenticate every time. Make sure it uses the correct key in case you have more than just one in the user's .ssh directory.
 
 ```
 ./10-ssh-keys.ssh
 ```
-This copies your ssh key ~/.ssh/id_rsa.pub key to the nodes in the `hosts` file.
+This copies your ssh key ~/.ssh/id_rsa.pub key to the nodes in the `engine` and `hosts` file.
 
 Now we need to install the required packages on all the nodes, the engine as well as the VM hosts:
 ```
-./15-install-packages.sh http://bob.eng.lab.tlv.redhat.com/builds/4.5/rhv-4.5.3-1/api/ 
+./15-install-packages.sh <REPO_URL>
 [LAB] Install engine
 ...
 [LAB] Install hosts
@@ -102,7 +113,7 @@ Add the templates to the RHV. If required, modify the vm-worker.template accordi
 ./40-add-templates.sh
 ```
 
-In case you need access to the RHV WebUI, the address is in the **engine** file, and the credentials are **admin / password**
+In case you need access to the RHV WebUI for further customization, the address is in the **engine** file, and the credentials are **admin / password**
 
 ## OCP cluster
 Now's the time to install the OCP cluster on the 5 nodes we spared out initially. Head over to [cloud.redhat.com](https://cloud.redhat.com) and set up a BM cluster.
@@ -115,14 +126,10 @@ The name for the cluster should be identical to the one in `common_funcs.sh`:
 **OCP_CLUSTER="perfscale"
 OCP_DOMAIN="example.com"**
 
-Once the OCP cluster is up and running, I installed the latest `oc` package from [oc source](https://docs.openshift.com/container-platform/4.7/cli_reference/openshift_cli/getting-started-cli.html) on the engine host, or any other host that can reach the cluster via the `API` address. 
+Once the OCP cluster is up and running, I installed the latest `oc` package from [oc source](https://access.redhat.com/downloads/content/290/ver=4.11/rhel---8/4.11.5/x86_64/product-software) on the engine host, or any other host that can reach the cluster via the `API` address. 
 Make sure to have the kubeconfig downloaded to that host.
 
 ## Get the VMs to work
-
-Configure the number of masters and or workers you want to deploy as VMs in `common_funs.sh`:
-**MASTERS=0
-WORKERS=800**
 
 Once that's done, add the templates to the RHV engine:
 ```bash
@@ -133,7 +140,7 @@ and create the VMs:
 ./45-add-vms.sh
 ```
 
-The VMs need to boot from a discovery ISO image in order to register with `cloud.redhat.com`. Follow the steps there to `Add Hosts` and upload the resulting ISO to the RHV engine:
+The VMs need to boot from a discovery ISO image in order to register with `cloud.redhat.com`. Follow the steps there to `Add Hosts` and upload the resulting ISO to the RHV engine with:
 ```bash
 ./ai-05-upload-iso.sh remote worker.iso "<URL_FOR_THE_ISO>"
 ```
