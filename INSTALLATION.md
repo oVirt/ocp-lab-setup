@@ -1,6 +1,6 @@
 # Walkthrough 
 
-This is a walkthrough for the OCP worker on VMs project, that can be found here: [ocp-lab-setu]() https://github.com/oVirt/ocp-lab-setup)
+This is a walkthrough for the OCP worker on VMs project, that can be found here: [ocp-lab-setup](https://github.com/oVirt/ocp-lab-setup)
 It is meant to result in 3 bare-metal OCP masters and a large number of virtual-machine based workers. The actual number depends on the resources you have 
 available in the RHV cluster that's set up as part of this walkthrough. The default is to have 3 virtual masters and 10 virtual workers though.
 
