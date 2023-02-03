@@ -9,6 +9,7 @@ render_line() {
     [[ "$1" =~ -fc640\. ]] && ifaces="eno1,ens2f0,ens2f1"
     [[ "$1" =~ e23-h12-.*-fc640\. || "$i" =~ e23-h24-.*-fc640\. ]] && ifaces="eno1,eth3,eth2"
     [[ "$1" =~ -r640\. ]] && ifaces="eno1np0,ens1f1,ens2f0"
+    [[ "$1" =~ -740xd\. ]] && ifaces="eno3,ens7f0,ens7f1"
     [[ "$ifaces" ]] || die "No networking match for $i"
     command echo "$i,$ifaces"
 }
