@@ -48,7 +48,7 @@ dhcp-range=tag:baremetal,${BAREMETAL_DHCP_RANGE},1h
 domain=${OCP_CLUSTER}.${OCP_DOMAIN}
 expand-hosts
 interface=baremetal
-server=$($SSH $ENGINE 'nmcli -f DHCP4.OPTION con s external | sed -n "s/.*domain_name_servers = \(.*\) .*/\1/p"')
+server=$($SSH $ENGINE 'nmcli -f DHCP4.OPTION con s external | sed -n "s/.* domain_name_servers = \(.*\)/\1/p" | cut -d " " -f1')
 EOF
 $SCP dnsmasq.conf $ENGINE:/etc/dnsmasq.d/lab.conf
 
