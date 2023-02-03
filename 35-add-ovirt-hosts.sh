@@ -16,6 +16,12 @@ for i in $HOSTS; do
 done
 
 echo "Add logical networks"
+# nmstate sometimes struggle with lab's dns, let's override it
+(grep nameserver /etc/resolv.conf | cut -d \  -f2)
+ovirtmgmt_id=$(curl_api "/networks?search=name=ovirtmgmt" | sed -n "s/.*network href.*id=\"\(.*\)\">/\1/p")
+dns=$(sed -n 's/^server=\(.*\)/\1/p' dnsmasq.conf)
+curl_api /networks/$ovirtmgmt_id  -X PUT -d "<network><dns_resolver_configuration><name_servers><name_server>$dns</name_server></name_servers></dns_resolver_configuration></network>"
+# define baremetal and provisioning
 dc_id=$(curl_api "/datacenters?search=name=Default" | sed -n "s/.*data_center href.*id=\"\(.*\)\">/\1/p")
 for net in baremetal provisioning; do
     curl_api /networks -d "<network> <name>$net</name> <data_center id=\"$dc_id\"/> </network>"
