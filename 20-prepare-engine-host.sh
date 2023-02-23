@@ -57,6 +57,11 @@ $SSH $ENGINE "dnsmasq --test; systemctl enable dnsmasq; systemctl restart dnsmas
 echo "Create data SD share"
 $SSH $ENGINE '
 mkdir -p /srv/data;
+if [[ $WHOLE_DISK ]]; then
+    mkfs.ext4 -F /dev/$WHOLE_DISK
+    grep -q /srv/data /etc/fstab || echo "/dev/$WHOLE_DISK /srv/data ext4 defaults 0 0" >> /etc/fstab
+    mount -a
+fi
 chown 36:36 /srv/data;
 chmod 775 /srv/data;
 echo "/srv/data *(rw,insecure,no_root_squash)" > /etc/exports.d/data.exports;
