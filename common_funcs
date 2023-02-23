@@ -11,7 +11,12 @@ IPMI_START="10.200.0.0" # has to be a.b.c.0/16
 OCP_CLUSTER="perf-test"
 OCP_DOMAIN="example.com"
 
+# Use local disk space on / or the whole disk (note it will be wiped silently!)
+# There needs to be enough space (~ 3x the DISK_SIZE below) on / of the engine host, and enough space to hold VM
+# data on each host (up to DISK_SIZE * number of VMs/host) - these are thin provisioned so you can overcommit
+# if you do not plan to use OCP's disk too much
 LOCALDISK_VG_MB="409600"
+#WHOLE_DISK=sdc
 
 MASTER_MEMORY=34359738368 #32GB
 MASTER_CPUS=20

@@ -27,16 +27,25 @@ wait
 
 echo "Setup local disk space on hosts"
 for i in $HOSTS; do
-	$SSH $i "
-    [[ -r /vg ]] || dd if=/dev/zero of=/vg bs=1M count=0 seek=$LOCALDISK_VG_MB;
-    echo \"#!/bin/bash\" > /etc/rc.local;
-    echo \"losetup /dev/loop0 /vg\" >> /etc/rc.local;
-    chmod +x /etc/rc.local;
-    [[ \"\$(losetup -a | cut -d: -f1)\" == /dev/loop0 ]] || /etc/rc.local;
-    lvmdevices --adddev /dev/loop0;
-    sleep 5;
-    pvdisplay -s /dev/loop0 || pvcreate /dev/loop0;
-    vgdisplay ovirt-local -s || vgcreate ovirt-local /dev/loop0;
+    $SSH $i "
+    if [[ $WHOLE_DISK ]]; then
+      # try dm first
+      MPATH=\$(lsblk /dev/$WHOLE_DISK -o NAME -l | tail -1);
+      DEV=/dev/mapper/\$MPATH;
+      # fall back to bare block device
+      [ -b \$DEV ] || DEV=/dev/$WHOLE_DISK
+    else
+      DEV=/dev/loop0
+      [[ -r /vg ]] || dd if=/dev/zero of=/vg bs=1M count=0 seek=$LOCALDISK_VG_MB;
+      echo \"#!/bin/bash\" > /etc/rc.local;
+      echo \"losetup \$DEV /vg\" >> /etc/rc.local;
+      chmod +x /etc/rc.local;
+      [[ \"\$(losetup -a | cut -d: -f1)\" == \$DEV ]] || /etc/rc.local;
+      lvmdevices --adddev \$DEV;
+      sleep 5;
+      pvdisplay -s \$DEV || pvcreate \$DEV;
+    fi
+    vgdisplay ovirt-local -s || { pvcreate -ff -y \$DEV; vgcreate -y ovirt-local \$DEV; };
     lvdisplay ovirt-local/pool0 || lvcreate -l100%FREE --thinpool pool0 ovirt-local" &
 done
 wait
