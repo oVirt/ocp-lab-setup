@@ -26,17 +26,15 @@ for i in $(seq 1 1 $WORKERS); do
     add_dns worker-$i
 done
 
-if [[ $# -gt 1 && "numa" == $(echo "$1" | tr '[:upper:]' '[:lower:]') && $2 -gt 0 ]]; then
+if [[ $# -gt 1 ]]; then
    echo "Create multi-NUMA VMs"
 
-   NUMA_NODES=$2
+   NUMA_NODES=$1
    NUMA_MEMORY=$(($WORKER_MEMORY / $NUMA_NODES)) # total memory (i.e. for 16GB and 4 nodes, 4GB for each NUMA)
 
    for j in $(seq 1 $NUMA_NODES); do
       curl_api vms/$id/numanodes -X POST -d "<vm_numa_node><cpu><cores><core><index>$j</index></core></cores></cpu><index>$j</index><memory>$NUMA_MEMORY</memory></vm_numa_node>"
    done
-else
-   echo "Create multi-NUMA VMs Failed: ./45-add-vms.sh NUMA|numa <# NUMA nodes>"
 fi
 
 # reread /etc/ethers
