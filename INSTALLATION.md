@@ -108,7 +108,7 @@ Add the hypervisor hosts. Make sure you don't have any duplicates in the hosts f
 ./35-add-ovirt-hosts.sh
 ```
 
-Add the templates to the RHV. If required, modify the vm-worker.template according to your needs first. 
+Add the templates to the RHV. If required, modify the vm-worker.template according to your needs first. As an example, in the template, you can only define a pre-requisite for NUMA. To actually enable multi-NUMA VMs, see step [Enable multi-NUMA VMs](#enable-multi-numa-vms).
 ```bash
 ./40-add-templates.sh
 ```
@@ -139,6 +139,19 @@ and create the VMs:
 ```bash
 ./45-add-vms.sh
 ```
+
+## Enable multi-NUMA VMs
+In the VM template itself you can only define a **pre-requisite for NUMA**. With the extra step below, you define the guest side NUMA topology with some random mapping to physical resources. Note that the random mapping may be non-optimal, but it needs to exist. Without this step, there is no NUMA enabled in the guests.
+
+```
+#!/bin/bash
+. common_funcs
+for j in $(seq 1 $NUMA_NODES); do
+  curl_api vms/$id/numanodes -X POST -d "<vm_numa_node><cpu><cores><core><index>$j</index></core></cores></cpu><index>$j</index><memory>$NUMA_MEMORY</memory></vm_numa_node>"
+    done
+done
+```
+This [creates a NUMA node]((http://ovirt.github.io/ovirt-engine-api-model/master/#services/vm_numa_nodes/methods/add)) for each vCPU.
 
 The VMs need to boot from a discovery ISO image in order to register with `cloud.redhat.com`. Follow the steps there to `Add Hosts` and upload the resulting ISO to the RHV engine with:
 ```bash
