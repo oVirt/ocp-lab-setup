@@ -108,7 +108,7 @@ Add the hypervisor hosts. Make sure you don't have any duplicates in the hosts f
 ./35-add-ovirt-hosts.sh
 ```
 
-Add the templates to the RHV. If required, modify the vm-worker.template according to your needs first. A
+Add the templates to the RHV. If required, modify the vm-worker.template according to your needs first. 
 ```bash
 ./40-add-templates.sh
 ```

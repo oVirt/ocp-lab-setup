@@ -19,23 +19,26 @@ for i in $(seq 1 1 $MASTERS); do
     add_dns master-$i
 done
 
+NUMA_NUM=$1
+function en_worker_numa {
+  local i=$1
+  [[ "$NUMA_NUM" ]] && NUMA_MEMORY=$(( $WORKER_MEMORY / $NUMA_NUM / 1024 / 1024 ))
+
+  echo "Enable multi-NUMA worker-$i"
+  NUMA_NODES=$((NUMA_NUM-1))
+  id=$(curl_api "/vms?search=name=worker-${i}" | sed -n "s/.*vm href.*id=\"\(.*\)\">/\1/p")
+  for j in $(seq 0 $NUMA_NODES); do 
+       curl_api vms/$id/numanodes -X POST -d "<vm_numa_node><cpu><cores><core><index>$j</index></core></cores></cpu><index>$j</index><memory>$NUMA_MEMORY</memory></vm_numa_node>"
+  done
+}
+
 echo "Create worker VMs"
 for i in $(seq 1 1 $WORKERS); do
     [[ "$(curl_api "/vms?search=name=worker-${i}" | wc -l)" -gt 2 ]] && { echo "VM worker-$i exists"; continue; }
     curl_api /vms -d "<vm> <name>worker-${i}</name> <cluster> <name>Default</name> </cluster> <template> <name>worker_template</name> </template> </vm>"
     add_dns worker-$i
+    en_worker_numa $i
 done
-
-if [[ $# -gt 1 ]]; then
-   echo "Create multi-NUMA VMs"
-
-   NUMA_NODES=$1
-   NUMA_MEMORY=$(($WORKER_MEMORY / $NUMA_NODES)) # total memory (i.e. for 16GB and 4 nodes, 4GB for each NUMA)
-
-   for j in $(seq 1 $NUMA_NODES); do
-      curl_api vms/$id/numanodes -X POST -d "<vm_numa_node><cpu><cores><core><index>$j</index></core></cores></cpu><index>$j</index><memory>$NUMA_MEMORY</memory></vm_numa_node>"
-   done
-fi
 
 # reread /etc/ethers
 $SSH $ENGINE "pkill -HUP dnsmasq"
