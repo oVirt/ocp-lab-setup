@@ -20,7 +20,7 @@ for i in $(seq 1 1 $MASTERS); do
 done
 
 NUMA_NUM=$1
-function en_worker_numa {
+function add_numa {
   local i=$1
   [[ "$NUMA_NUM" ]] && NUMA_MEMORY=$(( $WORKER_MEMORY / $NUMA_NUM / 1024 / 1024 ))
 
@@ -37,7 +37,9 @@ for i in $(seq 1 1 $WORKERS); do
     [[ "$(curl_api "/vms?search=name=worker-${i}" | wc -l)" -gt 2 ]] && { echo "VM worker-$i exists"; continue; }
     curl_api /vms -d "<vm> <name>worker-${i}</name> <cluster> <name>Default</name> </cluster> <template> <name>worker_template</name> </template> </vm>"
     add_dns worker-$i
-    en_worker_numa $i
+    if [ -n "$NUMA_NUM" ]; then
+        add_numa $i
+    fi
 done
 
 # reread /etc/ethers
